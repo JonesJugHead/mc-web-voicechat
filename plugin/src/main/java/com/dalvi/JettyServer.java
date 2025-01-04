@@ -7,7 +7,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class JettyServer {
@@ -15,7 +17,10 @@ public class JettyServer {
     private final int port;
     private Server server;
 
-    protected static Set<WebSocketEndpoint> endpoints = new HashSet<>();
+    public static final Set<WebSocketEndpoint> endpoints = new HashSet<>();
+    // La map pseudo -> endpoint
+    public static final Map<String, WebSocketEndpoint> endpointsByPlayer = new HashMap<>();
+
 
     public JettyServer(int port) {
         this.port = port;
@@ -58,18 +63,6 @@ public class JettyServer {
     public void stop() throws Exception {
         if (server != null) {
             server.stop();
-        }
-    }
-
-    /**
-     * Méthode pour envoyer un message à toutes les sessions connectées.
-     * On l'appelle depuis le plugin pour faire un broadcast.
-     */
-    public void broadcast(String message) {
-        synchronized (endpoints) {
-            for (WebSocketEndpoint endpoint : endpoints) {
-                endpoint.sendMessage(message);
-            }
         }
     }
 }

@@ -9,12 +9,15 @@ public class WebSocketEndpoint {
 
     private Session session;
 
+    // Sera rempli lors d'un "register"
+    private String playerName;
+
     @OnWebSocketConnect
     public void onConnect(Session session) {
         this.session = session;
-        System.out.println("[MyWebSocketEndpoint] Connecté : " + session.getRemoteAddress());
+        System.out.println("[WebSocketEndpoint] Connecté : " + session.getRemoteAddress());
 
-        // On enregistre la connexion dans le set statique
+        // Enregistrer la connexion dans le set
         synchronized (JettyServer.endpoints) {
             JettyServer.endpoints.add(this);
         }
@@ -22,19 +25,40 @@ public class WebSocketEndpoint {
 
     @OnWebSocketMessage
     public void onText(Session session, String message) {
-        System.out.println("[MyWebSocketEndpoint] Reçu : " + message);
-        // Ici, vous pouvez gérer la signalisation WebRTC, etc.
-        // Par exemple, le diffuser aux autres :
-        broadcastOthers(message);
+        System.out.println("[WebSocketEndpoint] Reçu : " + message);
+        try {
+            // Utilisez Gson ou org.json pour parser
+            com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(message).getAsJsonObject();
+            String type = json.get("type").getAsString();
+            if ("join".equals(type)) {
+                // => Le client nous envoie son pseudo
+                this.playerName = json.get("from").getAsString();
+                System.out.println("[WebSocketEndpoint] Le client se déclare pour le joueur : " + this.playerName);
+
+                // On l'enregistre dans la map
+                synchronized (JettyServer.endpointsByPlayer) {
+                    JettyServer.endpointsByPlayer.put(this.playerName, this);
+                }
+            }
+            broadcastOthers(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        System.out.println("[MyWebSocketEndpoint] Déconnecté : " + reason);
+        System.out.println("[WebSocketEndpoint] Déconnecté : " + reason);
 
-        // Retirer du set
+        // Supprimer de la collection globale
         synchronized (JettyServer.endpoints) {
             JettyServer.endpoints.remove(this);
+        }
+        // Supprimer de la map endpointsByPlayer, si on sait quel joueur c'était
+        if (this.playerName != null) {
+            synchronized (JettyServer.endpointsByPlayer) {
+                JettyServer.endpointsByPlayer.remove(this.playerName);
+            }
         }
     }
 
@@ -43,9 +67,7 @@ public class WebSocketEndpoint {
         error.printStackTrace();
     }
 
-    /**
-     * Envoyer un message à cette session
-     */
+    /** Envoyer un message JSON sur cette session précise. */
     public void sendMessage(String message) {
         if (session != null && session.isOpen()) {
             try {
@@ -56,9 +78,7 @@ public class WebSocketEndpoint {
         }
     }
 
-    /**
-     * Exemple : Broadcast du message aux autres, en ignorant soi-même
-     */
+    /** Broadcast à tous les autres, exemple. */
     private void broadcastOthers(String message) {
         synchronized (JettyServer.endpoints) {
             for (WebSocketEndpoint endpoint : JettyServer.endpoints) {

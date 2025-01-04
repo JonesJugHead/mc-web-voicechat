@@ -4,11 +4,12 @@
  * Représente la forme générale des messages WS qu'on s'échange
  */
 export interface WsMessage {
-    type: "pos" | "join" | "offer" | "answer" | "candidate" | string;
+    type: "spatial" | "join" | "offer" | "answer" | "candidate" | string;
     from?: string;
     to?: string | null;
     player?: string; // utilisé pour la position
     payload?: any;   // on garde un "any" pour rester flexible
+    targets?: Array<{ player: string, volume: number, pan: number }>; // utilisé pour la spatialisation
   }
   
   /**
