@@ -1,0 +1,4 @@
+name: DiscordWebhookPlugin
+version: 1.0
+main: com.dalvi.webhook.VoiceChatPlugin
+api-version: 1.21.3

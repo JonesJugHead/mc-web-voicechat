@@ -1,0 +1,4 @@
+name: WebVoiceChatPlugin
+version: 1.0
+main: com.dalvi.WebVoiceChatPlugin
+api-version: 1.21.3

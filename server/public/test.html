@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Chat</title>
+</head>
+<body>
+    <h1>Audio Chat</h1>
+    <input type="text" id="username" placeholder="Enter your username" />
+    <button id="joinBtn">Join</button>
+    <div id="users"></div>
+    <audio id="localAudio" autoplay muted></audio>
+    <div id="remoteAudios"></div>
+    <button id="toggleMic">Toggle Mic</button>
+
+    <script>
+        const ws = new WebSocket('ws://192.168.1.27:25566');
+        let localStream = null;
+        let connections = {};
+
+        document.getElementById('joinBtn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            if (!username) return alert('Username is required!');
+
+            ws.send(JSON.stringify({ type: 'set-username', username }));
+
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            document.getElementById('localAudio').srcObject = localStream;
+        });
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            switch (data.type) {
+                case 'user-list':
+                    updateUsersList(data.users);
+                    break;
+
+                case 'offer':
+                case 'answer':
+                case 'candidate':
+                    handleSignalingData(data);
+                    break;
+            }
+        };
+
+        function updateUsersList(users) {
+            const container = document.getElementById('users');
+            container.innerHTML = users.map(user => `<p>${user}</p>`).join('');
+        }
+
+        async function handleSignalingData(data) {
+            const { type, target, offer, answer, candidate } = data;
+
+            if (type === 'offer') {
+                const pc = createPeerConnection(target);
+                await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                ws.send(JSON.stringify({ type: 'answer', target, answer }));
+            }
+
+            if (type === 'answer') {
+                await connections[target].setRemoteDescription(new RTCSessionDescription(answer));
+            }
+
+            if (type === 'candidate') {
+                await connections[target].addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        }
+
+        function createPeerConnection(target) {
+            const pc = new RTCPeerConnection();
+            connections[target] = pc;
+
+            pc.ontrack = (event) => {
+                const audio = document.createElement('audio');
+                audio.srcObject = event.streams[0];
+                audio.autoplay = true;
+                document.getElementById('remoteAudios').appendChild(audio);
+            };
+
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({ type: 'candidate', target, candidate: event.candidate }));
+                }
+            };
+
+            return pc;
+        }
+
+        document.getElementById('toggleMic').addEventListener('click', () => {
+            const audioTrack = localStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled;
+        });
+    </script>
+</body>
+</html>

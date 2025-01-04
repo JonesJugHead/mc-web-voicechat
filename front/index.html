@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Appel vocal WebRTC - Spatialisation basique</title>
+</head>
+<body>
+  <h1>WebRTC + Spatialisation Minecraft</h1>
+
+  <div>
+    <label for="pseudo">Pseudo (identique à votre pseudo Minecraft) :</label>
+    <input type="text" id="pseudo" placeholder="MonPseudoMC" />
+    <button id="connectBtn">Se connecter</button>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button id="startAudioBtn" disabled>Activer mon micro</button>
+  </div>
+
+  <!-- On importe le script principal, qui importera le reste -->
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

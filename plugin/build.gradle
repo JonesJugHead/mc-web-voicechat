@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2' // Plugin Shadow pour regrouper les dépendances
+}
+
+group = 'com.dalvi'
+version = '1.0'
+description = 'WebVoiceChatPlugin'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // Spigot 1.17+ nécessite Java 17
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' // Dépôt Spigot API
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.21.3-R0.1-SNAPSHOT' // Dépendance Spigot API
+//    implementation 'org.java-websocket:Java-WebSocket:1.5.2' // Bibliothèque WebSocket
+    implementation 'com.google.code.gson:gson:2.9.0' // Bibliothèque Gson
+    implementation 'org.eclipse.jetty:jetty-server:11.0.16'
+    implementation 'org.eclipse.jetty:jetty-servlet:11.0.16'
+    implementation 'org.eclipse.jetty.websocket:websocket-jetty-server:11.0.16'
+}
+
+tasks {
+    shadowJar {
+        archiveBaseName.set('WebVoiceChatPlugin')
+        archiveVersion.set('') // Pas de version dans le nom du .jar
+        archiveClassifier.set('') // Supprime le suffixe "-all" dans le nom du fichier .jar
+    }
+}
+
+jar {
+    enabled = false // Désactiver la tâche jar par défaut, on utilise shadowJar
+}
+
+build {
+    dependsOn shadowJar // Génère un fichier .jar ombré lors de la construction
+}
