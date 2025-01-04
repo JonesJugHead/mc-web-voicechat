@@ -1,93 +1,56 @@
 package com.dalvi;
 
-import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.util.logging.Logger;
 
-import java.io.IOException;
-
-public class WebVoiceChatPlugin extends JavaPlugin implements Listener {
-
-    private SignalingServer webSocketService;
-    private static final int PORT = 25566;
+public class WebVoiceChatPlugin extends JavaPlugin {
+    private static final int JETTY_PORT = 25566; // Port HTTP + WebSocket
+    private JettyServer jettyServer;
 
     @Override
     public void onEnable() {
-        Bukkit.getPluginManager().registerEvents(this, this);
-        webSocketService = new SignalingServer(PORT);
-        webSocketService.start();
-        startStaticHttpServer();
-        getLogger().info("WebVoiceChatPlugin activé et WebSocket démarré sur le port " + PORT);
+        Logger log = getLogger();
+        log.info("WebVoiceChatPlugin démarrage...");
+
+        // 1) Lancer le serveur Jetty (HTTP + WebSocket sur le même port)
+        jettyServer = new JettyServer(JETTY_PORT);
+        try {
+            jettyServer.start();
+            log.info("Jetty lancé sur le port " + JETTY_PORT);
+        } catch (Exception e) {
+            log.severe("Impossible de démarrer Jetty : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // 2) Enregistrer l'EventListener pour le PlayerMoveEvent
+        Bukkit.getPluginManager().registerEvents(new WebVoiceChatMoveListener(this), this);
+
+        log.info("WebVoiceChatPlugin activé !");
     }
 
     @Override
     public void onDisable() {
-        if (webSocketService != null) {
+        Logger log = getLogger();
+        // Arrêter Jetty
+        if (jettyServer != null) {
             try {
-                webSocketService.stop();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                jettyServer.stop();
+                log.info("Jetty arrêté.");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        stopStaticHttpServer();
-        getLogger().info("WebVoiceChatPlugin désactivé !");
+        log.info("WebVoiceChatPlugin désactivé.");
     }
 
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if (event.getFrom().distance(event.getTo()) == 0) return;
-
-        String playerName = event.getPlayer().getName();
-        double x = event.getTo().getX();
-        double y = event.getTo().getY();
-        double z = event.getTo().getZ();
-
-        Player player = event.getPlayer();
-
-        float yaw = player.getLocation().getYaw();
-        float pitch = player.getLocation().getPitch();
-
-        JsonObject json = new JsonObject();
-        json.addProperty("type", "pos");
-        json.addProperty("player", playerName);
-
-        int degrees = (Math.round(player.getLocation().getYaw()) + 270) % 360;
-
-        JsonObject posData = new JsonObject();
-        posData.addProperty("x", x);
-        posData.addProperty("y", y);
-        posData.addProperty("z", z);
-        posData.addProperty("yaw", yaw);
-        posData.addProperty("pitch", pitch);
-        // (roll est rarement utilisé en Minecraft, mais vous pourriez l’ajouter)
-
-        json.add("payload", posData);
-
-        webSocketService.broadcast(json.toString());
-    }
-
-
-    private StaticHttpServer staticHttpServer;
-
-    private void startStaticHttpServer() {
-        int httpPort = 25566;
-        staticHttpServer = new StaticHttpServer(httpPort);
-        try {
-            staticHttpServer.start();
-            getLogger().info("Mini-serveur HTTP démarré sur le port " + httpPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void stopStaticHttpServer() {
-        if (staticHttpServer != null) {
-            staticHttpServer.stop();
+    /**
+     * Méthode utilitaire pour envoyer un message WebSocket (broadcast)
+     * aux sessions connectées. Par exemple pour diffuser la position.
+     */
+    public void broadcastWebSocket(String message) {
+        if (jettyServer != null) {
+            jettyServer.broadcast(message);
         }
     }
 }
