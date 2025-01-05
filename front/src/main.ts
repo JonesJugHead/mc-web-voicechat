@@ -13,6 +13,7 @@ window.store = store;
 const pseudoInput = document.getElementById("pseudo") as HTMLInputElement;
 const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement;
 const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
+const disconnectBtn = document.getElementById("disconnectBtn") as HTMLButtonElement;
 const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTMLButtonElement;
 const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
 
@@ -91,6 +92,32 @@ startAudioBtn.onclick = async () => {
   }
 };
 
+
+
+disconnectBtn.onclick = () => {
+  Object.keys(store.peers).forEach(peerId => {
+    store.peers[peerId].close();
+    delete store.peers[peerId];
+  });
+
+  if (store.ws) {
+    store.ws.close();
+    store.ws = null;
+  }
+
+  // 3. Réinitialiser le store
+  store.localPseudo = "";
+  store.localStream?.getTracks().forEach(track => track.stop());
+  store.localStream = null;
+
+  // 4. Réinitialiser l'interface
+  pseudoInput.disabled = false;
+  pseudoInput.value = "";
+  connectBtn.disabled = false;
+  startAudioBtn.disabled = true;
+  disconnectBtn.disabled = true;
+
+};
 
 
 async function populateMicrophoneList() {
