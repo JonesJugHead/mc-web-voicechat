@@ -68,7 +68,7 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: v${{ env.next_version }}
-          release_name: Release v${{ env.next_version }}
+          release_name: Release-v${{ env.next_version }}
           body: |
             ### Changes
             - Front-end built and packaged.
@@ -81,6 +81,8 @@ jobs:
       # Upload the artifact to the release
       - name: Upload Jar to Release
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: plugin/build/libs/WebVoiceChatPlugin.jar
