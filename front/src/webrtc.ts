@@ -1,4 +1,3 @@
-// webrtc.ts
 import { store } from "./store";
 import { sendMessage } from "./websocket";
 

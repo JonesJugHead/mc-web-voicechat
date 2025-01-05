@@ -1,5 +1,3 @@
-// store.ts
-
 import { AudioNodes, PeerConnections } from "./types";
 
 export const store = {

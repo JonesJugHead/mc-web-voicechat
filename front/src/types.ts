@@ -1,5 +1,3 @@
-// types.ts
-
 /**
  * Représente la forme générale des messages WS qu'on s'échange
  */
