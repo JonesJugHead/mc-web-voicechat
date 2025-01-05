@@ -13,6 +13,8 @@ window.store = store;
 const pseudoInput = document.getElementById("pseudo") as HTMLInputElement;
 const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement;
 const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
+const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTMLButtonElement;
+const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
 
 /**
  * Bouton "Se connecter" : initialise pseudo, connecte WebSocket
@@ -86,5 +88,83 @@ startAudioBtn.onclick = async () => {
   } catch (err) {
     console.error("Erreur getUserMedia :", err);
     alert("Impossible d'accéder au micro.");
+  }
+};
+
+
+
+async function populateMicrophoneList() {
+
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const audioInputs = devices.filter(device => device.kind === "audioinput");
+
+    micSelect.innerHTML = ""; // Réinitialise la liste
+    audioInputs.forEach(device => {
+      const option = document.createElement("option");
+      option.value = device.deviceId;
+      option.textContent = device.label || `Microphone ${micSelect.options.length + 1}`;
+      micSelect.appendChild(option);
+    });
+
+    // Activer le bouton si des microphones sont disponibles
+    applyMicrophoneBtn.disabled = audioInputs.length === 0;
+  } catch (err) {
+    console.error("Erreur lors de la récupération des périphériques audio :", err);
+    alert("Impossible de récupérer la liste des microphones.");
+  }
+}
+
+populateMicrophoneList();
+
+
+
+applyMicrophoneBtn.onclick = async () => {
+  const deviceId = micSelect.value;
+
+  if (!deviceId) {
+    alert("Veuillez sélectionner un microphone.");
+    return;
+  }
+
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      audio: { deviceId: { exact: deviceId } },
+      video: false
+    });
+
+    if (store.localStream) {
+      store.localStream.getTracks().forEach(track => track.stop());
+    }
+    store.localStream = newStream;
+
+    console.log("Nouveau microphone activé :", deviceId);
+
+    Object.keys(store.peers).forEach(peerId => {
+      const pc = store.peers[peerId];
+      store.localStream!.getTracks().forEach(track => {
+        pc.addTrack(track, store.localStream!);
+      });
+    });
+
+    Object.keys(store.peers).forEach(peerId => {
+      const pc = store.peers[peerId];
+      pc.createOffer()
+        .then(offer => pc.setLocalDescription(offer))
+        .then(() => {
+          if (!pc.localDescription) return;
+          sendMessage({
+            type: "offer",
+            from: store.localPseudo,
+            to: peerId,
+            payload: pc.localDescription
+          });
+        })
+        .catch(console.error);
+    });
+
+    console.log("Nouveau flux audio envoyé.");
+  } catch (err) {
+    console.error("Erreur lors de la sélection du microphone :", err);
   }
 };

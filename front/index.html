@@ -17,6 +17,19 @@
     <button id="startAudioBtn" disabled>Activer mon micro</button>
   </div>
 
+  <div>
+    <label for="microphoneSelect">Choisir un microphone :</label>
+    <select id="microphoneSelect"></select>
+    <button id="applyMicrophoneBtn" disabled>Appliquer</button>
+  </div>
+  
+
+  <div style="margin-top: 20px;">
+    <h3>Joueurs connectés :</h3>
+    <ul id="connectedPlayers"></ul>
+  </div>
+  
+
   <!-- On importe le script principal, qui importera le reste -->
   <script type="module" src="/src/main.ts"></script>
 </body>

@@ -1,8 +1,4 @@
-// websocket.ts
 import { store } from "./store";
-// import {
-//     handlePosition
-// } from "./positions";
 import {
     handleJoin,
     handleOffer,
