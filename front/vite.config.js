@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
-    outDir: 'dist', // Dossier de sortie
+    outDir: '../plugin/src/main/resources/web/', // Dossier de sortie
     rollupOptions: {
       input: 'index.html', // Fichier HTML d'entrée
       output: {
