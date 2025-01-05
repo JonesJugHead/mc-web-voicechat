@@ -10,6 +10,8 @@ import {
     handleCandidate
 } from "./webrtc";
 import { WsMessage } from "./types";
+import { handlePosition } from "./positions";
+
 
 /**
  * Connexion au serveur WebSocket
@@ -48,25 +50,6 @@ export function connectWebSocket(url: string): void {
 
         const { type, from, to } = data;
 
-        // Gestion position "pos"
-        // if (type === "pos") {
-        //     handlePosition(data);
-        //     return;
-        // }
-
-        if (type === "spatial") {
-            if (data.targets) {
-                data.targets.forEach(({ player, volume, pan }) => {
-                    const audioNodeConfig = store.audioNodes[player];
-                    if (audioNodeConfig) {
-                        audioNodeConfig.gain.gain.value = volume;
-                        audioNodeConfig.panner.pan.value = pan;
-                    }
-                });
-            }
-        }
-
-
         // Les autres messages WebRTC : on ignore si ce n’est pas pour nous
         if (to && to !== store.localPseudo) return;
 
@@ -85,6 +68,11 @@ export function connectWebSocket(url: string): void {
                 break;
             case "ping":
                 store.ws?.send(JSON.stringify({ type: "pong" }));
+                break;
+            case "pong":
+                break;
+            case "spatial":
+                handlePosition(data);
                 break;
             default:
                 console.warn("Type de message inconnu :", type);

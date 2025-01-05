@@ -1,7 +1,6 @@
 // webrtc.ts
 import { store } from "./store";
 import { sendMessage } from "./websocket";
-import { updateAllSpatialization } from "./positions";
 
 /**
  * Configuration RTC (serveurs STUN/TURN si besoin)
@@ -90,8 +89,6 @@ export function createSpatialAudioNode(peerId: string, remoteStream: MediaStream
     filter: filterNode
   };
 
-  // Mise à jour de la spatialisation (si on a déjà des positions)
-  updateAllSpatialization();
 }
 
 /**

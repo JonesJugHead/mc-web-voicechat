@@ -9,25 +9,7 @@ export interface WsMessage {
     to?: string | null;
     player?: string; // utilisé pour la position
     payload?: any;   // on garde un "any" pour rester flexible
-    targets?: Array<{ player: string, volume: number, pan: number }>; // utilisé pour la spatialisation
-  }
-  
-  /**
-   * Position Minecraft
-   */
-  export interface Position {
-    x: number;
-    y: number;
-    z: number;
-    yaw: number;
-    pitch: number;
-  }
-  
-  /**
-   * Stockage des positions par pseudo de joueur
-   */
-  export interface Positions {
-    [player: string]: Position;
+    targets?: Array<{ player: string, volume: number, pan: number, angle: number }>;
   }
   
   /**
