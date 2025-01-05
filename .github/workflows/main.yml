@@ -43,6 +43,8 @@ jobs:
       # Determine the next release version
       - name: Determine next release version
         id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # Get the latest release version from GitHub
           latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' || echo "1.0")
