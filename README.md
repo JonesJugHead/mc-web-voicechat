@@ -1,13 +1,13 @@
 # WebVoiceChat Plugin
 
-**WebVoiceChat** brings voice communication to Minecraft! This plugin allows players to talk to each other in a realistic, proximity-based way. Whether you're exploring dungeons, building with friends, or battling enemies, you can hear others as if they're standing next to you—complete with realistic volume and left-right positioning.
+**WebVoiceChat** brings immersive 3D sound to Minecraft! This plugin allows players to communicate with realistic, position-based audio that enhances gameplay. Whether you're exploring dungeons, building with friends, or battling enemies, you'll hear others exactly as if they were in the same space—with sound coming from the precise direction of its source.
 
 ---
 
 ## Key Features
 
 - **Proximity Voice Chat**: Hear players louder when they're close and softer when they're far away. 
-- **Realistic Audio Positioning**: Sound adjusts based on where other players are relative to you (left, right, front, or back).  
+- **Immersive 3D Audio**: Sound is positioned based on the direction and distance of other players. Know instantly if a voice is coming from your left, right, front, or behind you.
 - **Integrated WebRTC Support**: Connect using a web browser on your phone, tablet, or computer—no mods needed!  
 - **Easy Configuration**: Adjust hearing distance dynamically with a simple command.  
 
@@ -88,17 +88,16 @@ Feel free to report bugs, request features, or contribute to development. Let’
 
 # French - Français
 
-**WebVoiceChat** apporte la communication vocale à Minecraft! Ce plugin permet aux joueurs de se parler de manière réaliste, basée sur la proximité. Que vous exploriez des donjons, construisiez avec des amis ou combattiez des ennemis, vous pouvez entendre les autres comme s'ils étaient à côté de vous, avec un volume réaliste et un positionnement gauche-droite.
+**WebVoiceChat** révolutionne la communication vocale dans Minecraft grâce à une expérience sonore immersive en 3D ! Ce plugin permet aux joueurs de se parler de manière réaliste, avec un son qui évolue en fonction de leur position dans l'environnement. Que vous exploriez des donjons, construisiez avec des amis ou affrontiez des ennemis, plongez dans une ambiance audio tridimensionnelle où chaque voix semble venir précisément de sa source.
 
 ---
 
 ## Caractéristiques clés
 
 - **Chat vocal de proximité**: Entendez les joueurs plus fort lorsqu'ils sont proches et plus doux lorsqu'ils sont loin.
-- **Positionnement audio réaliste**: Le son s'ajuste en fonction de l'emplacement des autres joueurs par rapport à vous (gauche, droite, avant ou arrière).
+- **Audio 3D Immersif** : Le son est positionné en fonction de l'orientation et de la distance des autres joueurs. Vous saurez si une voix provient de votre gauche, droite, devant ou derrière.
 - **Support WebRTC intégré**: Connectez-vous à l'aide d'un navigateur Web sur votre téléphone, tablette ou ordinateur, sans besoin de mods!
 - **Configuration facile**: Ajustez la distance d'écoute dynamiquement avec une simple commande.
-- **Commandes**: Commandes pour les administrateurs pour régler la distance d'écoute.
 
 ---
 
