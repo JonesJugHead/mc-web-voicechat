@@ -36,6 +36,14 @@ public class WebVoiceChatPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new WebVoiceChatMoveListener(this), this);
         this.getCommand("setmaxdistance").setExecutor(new SetMaxDistanceCommand(this));
 
+        Bukkit.getOnlinePlayers().stream()
+                .filter(Player::isOp)
+                .forEach(op -> op.sendMessage("§a[WebVoiceChat] Plugin activé !"));
+        Bukkit.getOnlinePlayers().stream()
+                .filter(Player::isOp)
+                .forEach(op -> op.sendMessage("§bGitHub : §nhttps://github.com/Dalvii/mc-web-voicechat"));
+
+
         log.info("WebVoiceChatPlugin activé !");
     }
 

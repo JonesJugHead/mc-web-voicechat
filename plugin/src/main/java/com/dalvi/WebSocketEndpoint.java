@@ -1,5 +1,7 @@
 package com.dalvi;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import java.io.IOException;
@@ -35,6 +37,19 @@ public class WebSocketEndpoint {
                 this.playerName = json.get("from").getAsString();
                 System.out.println("[WebSocketEndpoint] Le client se déclare pour le joueur : " + this.playerName);
 
+                Player player = Bukkit.getPlayerExact(playerName);
+                if (player != null) {
+                    player.sendMessage("§a[WebVoiceChat] Vous êtes connecté au vocal !");
+
+                    Bukkit.getOnlinePlayers().stream()
+                            .filter(Player::isOp)
+                            .forEach(op -> op.sendMessage("§e[WebVoiceChat] Le joueur §6" + playerName + "§e s'est connecté au vocal."));
+                } else {
+                    Bukkit.getOnlinePlayers().stream()
+                            .filter(Player::isOp)
+                            .forEach(op -> op.sendMessage("§c[WebVoiceChat] Un utilisateur a essayé de se connecter avec un pseudo invalide ou hors ligne : §6" + playerName));
+                }
+
                 // On l'enregistre dans la map
                 synchronized (JettyServer.endpointsByPlayer) {
                     JettyServer.endpointsByPlayer.put(this.playerName, this);
@@ -59,6 +74,15 @@ public class WebSocketEndpoint {
             synchronized (JettyServer.endpointsByPlayer) {
                 JettyServer.endpointsByPlayer.remove(this.playerName);
             }
+
+            Player player = Bukkit.getPlayerExact(this.playerName);
+            if (player != null) {
+                player.sendMessage("§c[WebVoiceChat] Vous êtes déconnecté du vocal.");
+            }
+
+            Bukkit.getOnlinePlayers().stream()
+                    .filter(Player::isOp)
+                    .forEach(op -> op.sendMessage("§e[WebVoiceChat] Le joueur §6" + this.playerName + "§e a été déconnecté du vocal."));
         }
     }
 
