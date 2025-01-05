@@ -2,34 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WebRTC Voice Call - Basic Spatialization</title>
+  <title>Minecraft 3D Spatial Voice Chat</title>
+  <meta name="description" content="A web application for proximity voice chat in Minecraft using WebRTC.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <h1>WebRTC + Minecraft Spatialization</h1>
 
-  <div>
-    <label for="pseudo">Username (same as your Minecraft username):</label>
-    <input type="text" id="pseudo" placeholder="MyMinecraftUsername" />
-    <button id="connectBtn">Connect</button>
+  <header>
+    <h1>Minecraft 3D Spatial Voice Chat</h1>
+    <p>Immerse yourself in spatial voice chat directly within Minecraft.</p>
+  </header>
+
+  <div class="container">
+    <div class="control-section">
+      <label for="pseudo">Username (same as your Minecraft username):</label>
+      <input type="text" id="pseudo" placeholder="MyMinecraftUsername" />
+      <button id="connectBtn">Connect</button>
+    </div>
+
+    <div class="control-section">
+      <button id="startAudioBtn" disabled>Enable My Microphone</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+    </div>
+
+    <div class="control-section">
+      <label for="microphoneSelect">Select a microphone:</label>
+      <select id="microphoneSelect"></select>
+      <button id="applyMicrophoneBtn" disabled>Apply</button>
+    </div>
+
+    <div class="control-section">
+      <h3>Connected Players:</h3>
+      <ul id="connectedPlayers"></ul>
+    </div>
   </div>
 
-  <div style="margin-top: 20px;">
-    <button id="startAudioBtn" disabled>Enable my microphone</button>
-    <button id="disconnectBtn" disabled>Disconnect</button>
+  <div class="container">
+    <h3>Plugin Information</h3>
+    <p>This plugin enables spatial proximity voice chat for Minecraft players using WebRTC.</p>
+    <p>Author: Théo Vidal</p>
+    <p>Email: <a href="mailto:contact@theovidal.com">contact@theovidal.com</a></p>
+    <p>GitHub: <a href="https://github.com/Dalvii/mc-web-voicechat" target="_blank">mc-web-voicechat</a>, feel free to contribute!</p>
   </div>
 
-  <div>
-    <label for="microphoneSelect">Select a microphone:</label>
-    <select id="microphoneSelect"></select>
-    <button id="applyMicrophoneBtn" disabled>Apply</button>
-  </div>
-  
-
-  <div style="margin-top: 20px;">
-    <h3>Connected Players:</h3>
-    <ul id="connectedPlayers"></ul>
-  </div>
-  
+  <footer>
+    <p>&copy; 2025 - Minecraft Spatial Voice Chat Project</p>
+  </footer>
 
   <script type="module" src="/src/main.ts"></script>
 </body>
