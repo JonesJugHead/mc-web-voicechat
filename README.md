@@ -2,6 +2,8 @@
 
 **WebVoiceChat** brings immersive 3D sound to Minecraft! This plugin allows players to communicate with realistic, position-based audio that enhances gameplay. Whether you're exploring dungeons, building with friends, or battling enemies, you'll hear others exactly as if they were in the same space—with sound coming from the precise direction of its source.
 
+![Screenshot of WebVoiceChat](docs/screenshot.png)
+
 ---
 
 ## Key Features
