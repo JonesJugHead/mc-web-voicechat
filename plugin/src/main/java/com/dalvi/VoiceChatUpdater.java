@@ -89,32 +89,34 @@ public class VoiceChatUpdater extends BukkitRunnable {
 
     public static VolumePan computeVolumePan(PlayerData listener, PlayerData source, double maxDist) {
         double dx = source.x - listener.x;
-        double dy = source.y - listener.y;
+        double dy = source.y - listener.y; // On garde dy si vous souhaitez l'utiliser plus tard
         double dz = source.z - listener.z;
 
+        // Distance euclidienne
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
+        // Volume linéaire en fonction de la distance (1.0 = max, 0.0 = hors de portée)
         double volume = 1.0 - dist / maxDist;
         volume = Math.max(0, Math.min(1, volume)); // Bornage dans [0, 1]
 
-        // Conversion du yaw en radians
+        // Yaw du listener en radians
         double yawRad = Math.toRadians(listener.yaw);
 
-        // Transformation des coordonnées locales
+        // Transformation des coordonnées globales en coordonnées locales du listener
         double cosA = Math.cos(-yawRad);
         double sinA = Math.sin(-yawRad);
         double localX = dx * cosA - dz * sinA;
         double localZ = dx * sinA + dz * cosA;
 
-        // Calcul de l'angle local
-        double angle = Math.atan2(-localX, localZ);
+        // Calcul de l'angle en coordonnées locales
+        double angle = Math.atan2(-localX, localZ); // Angle entre -π et +π
 
-        // Conversion de l'angle en pan [-1..1]
-        double pan = angle / (Math.PI / 2);
-        pan = Math.max(-1, Math.min(1, pan)); // Bornage dans [-1, 1]
+        // Pan basé sur le sinus de l'angle (variation douce entre -1 et 1)
+        double pan = Math.sin(angle);
 
         return new VolumePan(volume, pan, angle);
     }
+
 
 
     public void sendToPlayer(String playerName, String message) {
