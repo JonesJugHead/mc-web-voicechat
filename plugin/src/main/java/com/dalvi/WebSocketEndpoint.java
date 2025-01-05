@@ -25,7 +25,6 @@ public class WebSocketEndpoint {
 
     @OnWebSocketMessage
     public void onText(Session session, String message) {
-        System.out.println("[WebSocketEndpoint] Received: " + message);
         try {
             com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(message).getAsJsonObject();
             String type = json.get("type").getAsString();
