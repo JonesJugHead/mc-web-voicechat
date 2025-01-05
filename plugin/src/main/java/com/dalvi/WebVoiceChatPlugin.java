@@ -29,7 +29,7 @@ public class WebVoiceChatPlugin extends JavaPlugin {
 
         this.getCommand("setmaxdistance").setExecutor(new SetMaxDistanceCommand(this));
 
-        new VoiceChatUpdater(this).runTaskTimer(this, 2L, 20L);
+        new VoiceChatUpdater(this).runTaskTimer(this, 20L, 4L);
 
         Bukkit.getOnlinePlayers().stream()
                 .filter(Player::isOp)
