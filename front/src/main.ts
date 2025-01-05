@@ -6,15 +6,12 @@ import {
 import {
   store
 } from "./store";
+import { connectBtn, disconnectBtn, pseudoInput, resetUI, setPseudoDisabled, showToast, startAudioBtn } from './dom';
 
 // @ts-ignore
 window.store = store;
 
 // DOM elements retrieval
-const pseudoInput = document.getElementById("pseudo") as HTMLInputElement;
-const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement;
-const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
-const disconnectBtn = document.getElementById("disconnectBtn") as HTMLButtonElement;
 const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTMLButtonElement;
 const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
 
@@ -24,7 +21,7 @@ const micSelect = document.getElementById("microphoneSelect") as HTMLSelectEleme
 connectBtn.onclick = () => {
   const pseudo = pseudoInput.value.trim();
   if (!pseudo) {
-    alert("Please enter your username (same as Minecraft).");
+    showToast("Please enter your username.");
     return;
   }
 
@@ -49,8 +46,7 @@ connectBtn.onclick = () => {
     });
   }, 500);
 
-  connectBtn.disabled = true;
-  pseudoInput.disabled = true;
+  setPseudoDisabled(true);
 };
 
 /**
@@ -89,7 +85,7 @@ startAudioBtn.onclick = async () => {
     startAudioBtn.disabled = true;
   } catch (err) {
     console.error("getUserMedia error:", err);
-    alert("Unable to access the microphone.");
+    showToast("Unable to access the microphone.");
   }
 };
 
@@ -110,11 +106,7 @@ disconnectBtn.onclick = () => {
   store.localStream = null;
 
   // Reset the UI
-  pseudoInput.disabled = false;
-  pseudoInput.value = "";
-  connectBtn.disabled = false;
-  startAudioBtn.disabled = true;
-  disconnectBtn.disabled = true;
+  resetUI()
 };
 
 async function populateMicrophoneList() {
@@ -135,7 +127,7 @@ async function populateMicrophoneList() {
     applyMicrophoneBtn.disabled = audioInputs.length === 0;
   } catch (err) {
     console.error("Error retrieving audio devices:", err);
-    alert("Unable to retrieve the list of microphones.");
+    showToast("Unable to retrieve the list of microphones.");
   }
 }
 
@@ -145,7 +137,7 @@ applyMicrophoneBtn.onclick = async () => {
   const deviceId = micSelect.value;
 
   if (!deviceId) {
-    alert("Please select a microphone.");
+    showToast("Please select a microphone.");
     return;
   }
 
@@ -187,6 +179,9 @@ applyMicrophoneBtn.onclick = async () => {
 
     console.log("New audio stream sent.");
   } catch (err) {
+    showToast("Unable to select the microphone.");
     console.error("Error selecting the microphone:", err);
   }
 };
+
+

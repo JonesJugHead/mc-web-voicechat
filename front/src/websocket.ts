@@ -7,6 +7,7 @@ import {
 } from "./webrtc";
 import { WsMessage } from "./types";
 import { handlePosition } from "./positions";
+import { resetUI, setConectionControls, showToast } from "./dom";
 
 /**
  * Connect to the WebSocket server
@@ -20,6 +21,7 @@ export function connectWebSocket(url: string): void {
     store.ws.onopen = () => {
         console.log("Connected to the WebSocket server.");
         store.connected = true;
+        setConectionControls(true);
 
         // Enable the "Enable my microphone" button
         const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
@@ -77,10 +79,12 @@ export function connectWebSocket(url: string): void {
     store.ws.onclose = () => {
         console.log("Disconnected from the WebSocket server.");
         store.connected = false;
+        resetUI();
         clearInterval(interval);
     };
 
     store.ws.onerror = (err) => {
+        showToast("WebSocket error. Please reload the page.");
         console.error("WebSocket error:", err);
     };
 }

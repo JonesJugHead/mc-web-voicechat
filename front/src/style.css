@@ -141,3 +141,18 @@ footer a {
 footer a:hover {
   text-decoration: underline;
 }
+
+
+#toaster {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 0, 0, 0.9);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  display: none;
+  z-index: 1000;
+}

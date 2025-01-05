@@ -1,3 +1,4 @@
+import { updateConnectedPlayersList } from "./dom";
 import { store } from "./store";
 import { sendMessage } from "./websocket";
 
@@ -36,6 +37,18 @@ export function getOrCreatePeerConnection(peerId: string): RTCPeerConnection {
     createSpatialAudioNode(peerId, remoteStream);
   };
 
+  pc.onconnectionstatechange = () => {
+    updatePlayerList();
+  };
+
+  pc.oniceconnectionstatechange = () => {
+    if (pc.iceConnectionState === "disconnected") {
+      console.log("ICE disconnected from", peerId);
+      delete store.peers[peerId];
+      updatePlayerList();
+    }
+  };
+
   // If we already have the local stream (microphone), add it
   if (store.localStream) {
     store.localStream.getTracks().forEach(track => {
@@ -44,6 +57,7 @@ export function getOrCreatePeerConnection(peerId: string): RTCPeerConnection {
   }
 
   store.peers[peerId] = pc;
+  updatePlayerList();
   return pc;
 }
 
@@ -148,4 +162,9 @@ export function handleCandidate(peerId: string, candidate: RTCIceCandidateInit):
   console.log("handleCandidate from", peerId);
   const pc = getOrCreatePeerConnection(peerId);
   pc.addIceCandidate(new RTCIceCandidate(candidate)).catch(console.error);
+}
+
+
+function updatePlayerList() {
+  updateConnectedPlayersList(Object.keys(store.peers));
 }
