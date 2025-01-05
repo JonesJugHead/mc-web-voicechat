@@ -9,7 +9,7 @@ import {
 // @ts-ignore
 window.store = store;
 
-// Récupération des éléments du DOM
+// DOM elements retrieval
 const pseudoInput = document.getElementById("pseudo") as HTMLInputElement;
 const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement;
 const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
@@ -18,27 +18,27 @@ const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTML
 const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
 
 /**
- * Bouton "Se connecter" : initialise pseudo, connecte WebSocket
+ * "Connect" button: initializes username, connects WebSocket
  */
 connectBtn.onclick = () => {
   const pseudo = pseudoInput.value.trim();
   if (!pseudo) {
-    alert("Veuillez saisir votre pseudo (le même que Minecraft).");
+    alert("Please enter your username (same as Minecraft).");
     return;
   }
 
-  // Stocke le pseudo dans le store
+  // Store the username in the store
   store.localPseudo = pseudo;
 
-  // Crée (ou reprend) un contexte audio
+  // Create (or reuse) an audio context
   const ctx = new AudioContext();
-  store.audioContext?.valueOf; // juste pour s'assurer qu'il existe
+  store.audioContext?.valueOf; // just to ensure it exists
   store.audioContext = ctx;
 
-  // Lance la connexion WS (adapte l'URL à ton serveur)
+  // Start WebSocket connection (adapt the URL to your server)
   connectWebSocket("wss://" + window.location.host + "/ws");
 
-  // Après un petit délai, envoie un message "join"
+  // After a short delay, send a "join" message
   setTimeout(() => {
     sendMessage({
       type: "join",
@@ -53,14 +53,14 @@ connectBtn.onclick = () => {
 };
 
 /**
- * Bouton "Activer mon micro" : récupère le flux local
+ * "Enable my microphone" button: retrieves local stream
  */
 startAudioBtn.onclick = async () => {
   try {
     store.localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    console.log("Micro capturé.");
+    console.log("Microphone captured.");
 
-    // Ajoute ce flux à chaque PeerConnection existante
+    // Add this stream to each existing PeerConnection
     Object.keys(store.peers).forEach((peerId) => {
       const pc = store.peers[peerId];
       store.localStream!.getTracks().forEach(track => {
@@ -68,7 +68,7 @@ startAudioBtn.onclick = async () => {
       });
     });
 
-    // Optionnel : relancer une offre pour envoyer le flux
+    // Optional: restart an offer to send the stream
     Object.keys(store.peers).forEach(peerId => {
       const pc = store.peers[peerId];
       pc.createOffer()
@@ -87,12 +87,10 @@ startAudioBtn.onclick = async () => {
 
     startAudioBtn.disabled = true;
   } catch (err) {
-    console.error("Erreur getUserMedia :", err);
-    alert("Impossible d'accéder au micro.");
+    console.error("getUserMedia error:", err);
+    alert("Unable to access the microphone.");
   }
 };
-
-
 
 disconnectBtn.onclick = () => {
   Object.keys(store.peers).forEach(peerId => {
@@ -105,20 +103,18 @@ disconnectBtn.onclick = () => {
     store.ws = null;
   }
 
-  // 3. Réinitialiser le store
+  // Reset the store
   store.localPseudo = "";
   store.localStream?.getTracks().forEach(track => track.stop());
   store.localStream = null;
 
-  // 4. Réinitialiser l'interface
+  // Reset the UI
   pseudoInput.disabled = false;
   pseudoInput.value = "";
   connectBtn.disabled = false;
   startAudioBtn.disabled = true;
   disconnectBtn.disabled = true;
-
 };
-
 
 async function populateMicrophoneList() {
 
@@ -126,7 +122,7 @@ async function populateMicrophoneList() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const audioInputs = devices.filter(device => device.kind === "audioinput");
 
-    micSelect.innerHTML = ""; // Réinitialise la liste
+    micSelect.innerHTML = ""; // Reset the list
     audioInputs.forEach(device => {
       const option = document.createElement("option");
       option.value = device.deviceId;
@@ -134,23 +130,21 @@ async function populateMicrophoneList() {
       micSelect.appendChild(option);
     });
 
-    // Activer le bouton si des microphones sont disponibles
+    // Enable the button if microphones are available
     applyMicrophoneBtn.disabled = audioInputs.length === 0;
   } catch (err) {
-    console.error("Erreur lors de la récupération des périphériques audio :", err);
-    alert("Impossible de récupérer la liste des microphones.");
+    console.error("Error retrieving audio devices:", err);
+    alert("Unable to retrieve the list of microphones.");
   }
 }
 
 populateMicrophoneList();
 
-
-
 applyMicrophoneBtn.onclick = async () => {
   const deviceId = micSelect.value;
 
   if (!deviceId) {
-    alert("Veuillez sélectionner un microphone.");
+    alert("Please select a microphone.");
     return;
   }
 
@@ -165,7 +159,7 @@ applyMicrophoneBtn.onclick = async () => {
     }
     store.localStream = newStream;
 
-    console.log("Nouveau microphone activé :", deviceId);
+    console.log("New microphone activated:", deviceId);
 
     Object.keys(store.peers).forEach(peerId => {
       const pc = store.peers[peerId];
@@ -190,8 +184,8 @@ applyMicrophoneBtn.onclick = async () => {
         .catch(console.error);
     });
 
-    console.log("Nouveau flux audio envoyé.");
+    console.log("New audio stream sent.");
   } catch (err) {
-    console.error("Erreur lors de la sélection du microphone :", err);
+    console.error("Error selecting the microphone:", err);
   }
 };

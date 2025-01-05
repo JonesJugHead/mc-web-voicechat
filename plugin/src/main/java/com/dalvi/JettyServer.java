@@ -18,9 +18,8 @@ public class JettyServer {
     private Server server;
 
     public static final Set<WebSocketEndpoint> endpoints = new HashSet<>();
-    // La map pseudo -> endpoint
+    // Map pseudo -> endpoint
     public static final Map<String, WebSocketEndpoint> endpointsByPlayer = new HashMap<>();
-
 
     public JettyServer(int port) {
         this.port = port;
@@ -29,34 +28,26 @@ public class JettyServer {
     public void start() throws Exception {
         server = new Server(port);
 
-        // Contexte principal
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         server.setHandler(context);
 
-        // === 1) Servir fichiers statiques ===
-        // On charge /web dans le JAR (src/main/resources/web)
+        // Load /web from the JAR (src/main/resources/web)
         URL webRootUri = getClass().getResource("/web/");
         if (webRootUri != null) {
             context.setResourceBase(webRootUri.toExternalForm());
         } else {
-            System.out.println("[MyJettyServer] /web/ introuvable dans le JAR.");
+            System.out.println("[MyJettyServer] /web/ not found in the JAR.");
         }
 
-        // DefaultServlet pour les ressources statiques
+        // DefaultServlet for static resources
         ServletHolder holder = new ServletHolder("default", new DefaultServlet());
         context.addServlet(holder, "/*");
 
-        // === 2) Configurer WebSocket sur /ws ===
         JettyWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
-            // On peut configurer la taille max, etc.
-            // wsContainer.setMaxTextMessageSize(65535);
-
-            // On ajoute le mapping /ws qui pointera vers MyWebSocketEndpoint
             wsContainer.addMapping("/ws", (req, resp) -> new WebSocketEndpoint());
         });
 
-        // Démarrer Jetty
         server.start();
     }
 

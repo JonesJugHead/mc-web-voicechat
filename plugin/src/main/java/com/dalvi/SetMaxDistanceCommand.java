@@ -20,21 +20,21 @@ public class SetMaxDistanceCommand implements CommandExecutor {
         }
 
         try {
-            // Parse la distance
+            // Parse the distance
             double distance = Double.parseDouble(args[0]);
             if (distance <= 0) {
-                sender.sendMessage("§cLa distance doit être supérieure à 0 !");
+                sender.sendMessage("§cThe distance must be greater than 0!");
                 return true;
             }
 
             WebVoiceChatPlugin.setMaxDistance(distance);
 
-            sender.sendMessage("§aLa distance maximale a été mise à jour à " + distance + " blocs.");
+            sender.sendMessage("§aThe maximum distance has been updated to " + distance + " blocks.");
 
-            plugin.getServer().broadcastMessage("§eDistance maximale de la voix mise à jour à " + distance + " blocs.");
+            plugin.getServer().broadcastMessage("§eMaximum voice distance updated to " + distance + " blocks.");
 
         } catch (NumberFormatException e) {
-            sender.sendMessage("§cLa valeur entrée doit être un nombre valide !");
+            sender.sendMessage("§cThe entered value must be a valid number!");
         }
 
         return true;

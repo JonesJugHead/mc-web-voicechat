@@ -1,37 +1,36 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Appel vocal WebRTC - Spatialisation basique</title>
+  <title>WebRTC Voice Call - Basic Spatialization</title>
 </head>
 <body>
-  <h1>WebRTC + Spatialisation Minecraft</h1>
+  <h1>WebRTC + Minecraft Spatialization</h1>
 
   <div>
-    <label for="pseudo">Pseudo (identique à votre pseudo Minecraft) :</label>
-    <input type="text" id="pseudo" placeholder="MonPseudoMC" />
-    <button id="connectBtn">Se connecter</button>
+    <label for="pseudo">Username (same as your Minecraft username):</label>
+    <input type="text" id="pseudo" placeholder="MyMinecraftUsername" />
+    <button id="connectBtn">Connect</button>
   </div>
 
   <div style="margin-top: 20px;">
-    <button id="startAudioBtn" disabled>Activer mon micro</button>
-    <button id="disconnectBtn" disabled>Se déconnecter</button>
+    <button id="startAudioBtn" disabled>Enable my microphone</button>
+    <button id="disconnectBtn" disabled>Disconnect</button>
   </div>
 
   <div>
-    <label for="microphoneSelect">Choisir un microphone :</label>
+    <label for="microphoneSelect">Select a microphone:</label>
     <select id="microphoneSelect"></select>
-    <button id="applyMicrophoneBtn" disabled>Appliquer</button>
+    <button id="applyMicrophoneBtn" disabled>Apply</button>
   </div>
   
 
   <div style="margin-top: 20px;">
-    <h3>Joueurs connectés :</h3>
+    <h3>Connected Players:</h3>
     <ul id="connectedPlayers"></ul>
   </div>
   
 
-  <!-- On importe le script principal, qui importera le reste -->
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

@@ -19,17 +19,17 @@ public class VoiceChatUpdater extends BukkitRunnable {
 
     @Override
     public void run() {
-        // Récupère la distance maximale depuis le plugin
+        // Retrieve the maximum distance from the plugin
         double maxDist = WebVoiceChatPlugin.getMaxDistance();
 
-        // Pour chaque joueur A
+        // For each player A
         for (Player a : Bukkit.getOnlinePlayers()) {
             if (!a.isOnline()) continue;
 
-            // On prépare un tableau JSON "targets"
+            // Prepare a JSON array "targets"
             JsonArray targetsArray = new JsonArray();
 
-            // On récupère la position/orientation de A
+            // Retrieve A's position/orientation
             Location locA = a.getLocation();
             double ax = locA.getX();
             double ay = locA.getY();
@@ -37,30 +37,27 @@ public class VoiceChatUpdater extends BukkitRunnable {
             float yawA = locA.getYaw();
             float pitchA = locA.getPitch();
 
-            // Pour chaque autre joueur B
+            // For each other player B
             for (Player b : Bukkit.getOnlinePlayers()) {
-                if (b == a) continue; // On ne se calcule pas soi-même
+                if (b == a) continue; // Skip self
                 if (!b.isOnline()) continue;
 
                 Location locB = b.getLocation();
                 double dist = locA.distance(locB);
-                if (dist <= (maxDist*2)) {
-                    // => B est à portée. On calcule volume/pan.
+                if (dist <= (maxDist * 2)) {
+                    // => B is within range. Calculate volume/pan.
                     double bx = locB.getX();
                     double by = locB.getY();
                     double bz = locB.getZ();
-                    float yawB = locB.getYaw();  // Si vous en avez besoin
+                    float yawB = locB.getYaw();
 
-                    // Appel de votre fonction de calcul :
-                    // Exemple : computeVolumePan(A, B, maxDist) ou
-                    // computeVolumePan(ax, ay, az, yawA, pitchA, bx, by, bz).
                     VolumePan vp = computeVolumePan(
                             new PlayerData(ax, ay, az, yawA, pitchA),
-                            new PlayerData(bx, by, bz, yawB, 0.0f), // pitch de B si besoin
+                            new PlayerData(bx, by, bz, yawB, 0.0f),
                             maxDist
                     );
 
-                    // On créé un objet JSON pour ce joueur B
+                    // Create a JSON object for player B
                     JsonObject obj = new JsonObject();
                     obj.addProperty("player", b.getName());
                     obj.addProperty("volume", vp.volume);
@@ -70,54 +67,48 @@ public class VoiceChatUpdater extends BukkitRunnable {
                 }
             }
 
-            // Après avoir analysé tous les joueurs B, on envoie à A
-            // UNIQUEMENT si on a au moins un target
+            // ONLY if we have at least one target
             if (targetsArray.size() > 0) {
                 JsonObject json = new JsonObject();
                 json.addProperty("type", "spatial");
                 json.addProperty("who", a.getName());
                 json.add("targets", targetsArray);
 
-                // On envoie ce JSON uniquement à A
-                // => En supposant que vous ayez une méthode "sendToPlayer(playerName, messageJSON)"
+                // Send this JSON only to A
                 this.sendToPlayer(a.getName(), json.toString());
             }
         }
     }
 
-
-
     public static VolumePan computeVolumePan(PlayerData listener, PlayerData source, double maxDist) {
         double dx = source.x - listener.x;
-        double dy = source.y - listener.y; // On garde dy si vous souhaitez l'utiliser plus tard
+        double dy = source.y - listener.y;
         double dz = source.z - listener.z;
 
-        // Distance euclidienne
+        // Euclidean distance
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-        // Volume linéaire en fonction de la distance (1.0 = max, 0.0 = hors de portée)
+        // Linear volume based on distance (1.0 = max, 0.0 = out of range)
         double volume = 1.0 - dist / maxDist;
-        volume = Math.max(0, Math.min(1, volume)); // Bornage dans [0, 1]
+        volume = Math.max(0, Math.min(1, volume)); // Clamp within [0, 1]
 
-        // Yaw du listener en radians
+        // Listener's yaw in radians
         double yawRad = Math.toRadians(listener.yaw);
 
-        // Transformation des coordonnées globales en coordonnées locales du listener
+        // Convert global coordinates to listener's local coordinates
         double cosA = Math.cos(-yawRad);
         double sinA = Math.sin(-yawRad);
         double localX = dx * cosA - dz * sinA;
         double localZ = dx * sinA + dz * cosA;
 
-        // Calcul de l'angle en coordonnées locales
-        double angle = Math.atan2(-localX, localZ); // Angle entre -π et +π
+        // Calculate the angle in local coordinates
+        double angle = Math.atan2(-localX, localZ); // Angle between -π and +π
 
-        // Pan basé sur le sinus de l'angle (variation douce entre -1 et 1)
+        // Pan based on the sine of the angle (smooth variation between -1 and 1)
         double pan = Math.sin(angle);
 
         return new VolumePan(volume, pan, angle);
     }
-
-
 
     public void sendToPlayer(String playerName, String message) {
         WebSocketEndpoint endpoint = JettyServer.endpointsByPlayer.get(playerName);

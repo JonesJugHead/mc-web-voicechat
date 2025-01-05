@@ -11,15 +11,13 @@ public class WebSocketEndpoint {
 
     private Session session;
 
-    // Sera rempli lors d'un "register"
     private String playerName;
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
         this.session = session;
-        System.out.println("[WebSocketEndpoint] Connecté : " + session.getRemoteAddress());
+        System.out.println("[WebSocketEndpoint] Connected: " + session.getRemoteAddress());
 
-        // Enregistrer la connexion dans le set
         synchronized (JettyServer.endpoints) {
             JettyServer.endpoints.add(this);
         }
@@ -27,30 +25,29 @@ public class WebSocketEndpoint {
 
     @OnWebSocketMessage
     public void onText(Session session, String message) {
-        System.out.println("[WebSocketEndpoint] Reçu : " + message);
+        System.out.println("[WebSocketEndpoint] Received: " + message);
         try {
-            // Utilisez Gson ou org.json pour parser
             com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(message).getAsJsonObject();
             String type = json.get("type").getAsString();
             if ("join".equals(type)) {
-                // => Le client nous envoie son pseudo
+                // => The client sends us their username
                 this.playerName = json.get("from").getAsString();
-                System.out.println("[WebSocketEndpoint] Le client se déclare pour le joueur : " + this.playerName);
+                System.out.println("[WebSocketEndpoint] The client declares for the player: " + this.playerName);
 
                 Player player = Bukkit.getPlayerExact(playerName);
                 if (player != null) {
-                    player.sendMessage("§a[WebVoiceChat] Vous êtes connecté au vocal !");
+                    player.sendMessage("§a[WebVoiceChat] You are connected to the voice chat!");
 
                     Bukkit.getOnlinePlayers().stream()
                             .filter(Player::isOp)
-                            .forEach(op -> op.sendMessage("§e[WebVoiceChat] Le joueur §6" + playerName + "§e s'est connecté au vocal."));
+                            .forEach(op -> op.sendMessage("§e[WebVoiceChat] Player §6" + playerName + "§e has connected to the voice chat."));
                 } else {
                     Bukkit.getOnlinePlayers().stream()
                             .filter(Player::isOp)
-                            .forEach(op -> op.sendMessage("§c[WebVoiceChat] Un utilisateur a essayé de se connecter avec un pseudo invalide ou hors ligne : §6" + playerName));
+                            .forEach(op -> op.sendMessage("§c[WebVoiceChat] A user tried to connect with an invalid or offline username: §6" + playerName));
                 }
 
-                // On l'enregistre dans la map
+                // Register the player in the map
                 synchronized (JettyServer.endpointsByPlayer) {
                     JettyServer.endpointsByPlayer.put(this.playerName, this);
                 }
@@ -63,13 +60,12 @@ public class WebSocketEndpoint {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        System.out.println("[WebSocketEndpoint] Déconnecté : " + reason);
+        System.out.println("[WebSocketEndpoint] Disconnected: " + reason);
 
-        // Supprimer de la collection globale
+        // Remove from the global collection
         synchronized (JettyServer.endpoints) {
             JettyServer.endpoints.remove(this);
         }
-        // Supprimer de la map endpointsByPlayer, si on sait quel joueur c'était
         if (this.playerName != null) {
             synchronized (JettyServer.endpointsByPlayer) {
                 JettyServer.endpointsByPlayer.remove(this.playerName);
@@ -77,12 +73,12 @@ public class WebSocketEndpoint {
 
             Player player = Bukkit.getPlayerExact(this.playerName);
             if (player != null) {
-                player.sendMessage("§c[WebVoiceChat] Vous êtes déconnecté du vocal.");
+                player.sendMessage("§c[WebVoiceChat] You are disconnected from the voice chat.");
             }
 
             Bukkit.getOnlinePlayers().stream()
                     .filter(Player::isOp)
-                    .forEach(op -> op.sendMessage("§e[WebVoiceChat] Le joueur §6" + this.playerName + "§e a été déconnecté du vocal."));
+                    .forEach(op -> op.sendMessage("§e[WebVoiceChat] Player §6" + this.playerName + "§e has been disconnected from the voice chat."));
         }
     }
 
@@ -91,7 +87,6 @@ public class WebSocketEndpoint {
         error.printStackTrace();
     }
 
-    /** Envoyer un message JSON sur cette session précise. */
     public void sendMessage(String message) {
         if (session != null && session.isOpen()) {
             try {
@@ -102,7 +97,6 @@ public class WebSocketEndpoint {
         }
     }
 
-    /** Broadcast à tous les autres, exemple. */
     private void broadcastOthers(String message) {
         synchronized (JettyServer.endpoints) {
             for (WebSocketEndpoint endpoint : JettyServer.endpoints) {

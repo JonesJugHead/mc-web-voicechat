@@ -8,21 +8,20 @@ import {
 import { WsMessage } from "./types";
 import { handlePosition } from "./positions";
 
-
 /**
- * Connexion au serveur WebSocket
+ * Connect to the WebSocket server
  */
 export function connectWebSocket(url: string): void {
-    // Établit la connexion
+    // Establish the connection
     store.ws = new WebSocket(url);
 
     let interval: ReturnType<typeof setTimeout>;
 
     store.ws.onopen = () => {
-        console.log("Connecté au serveur WebSocket.");
+        console.log("Connected to the WebSocket server.");
         store.connected = true;
 
-        // Active le bouton "Activer mon micro"
+        // Enable the "Enable my microphone" button
         const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
         if (startAudioBtn) {
             startAudioBtn.disabled = false;
@@ -40,13 +39,13 @@ export function connectWebSocket(url: string): void {
         try {
             data = JSON.parse(event.data);
         } catch (e) {
-            console.warn("Message non JSON :", event.data);
+            console.warn("Non-JSON message received:", event.data);
             return;
         }
 
         const { type, from, to } = data;
 
-        // Les autres messages WebRTC : on ignore si ce n’est pas pour nous
+        // Other WebRTC messages: ignore if not for us
         if (to && to !== store.localPseudo) return;
 
         switch (type) {
@@ -71,23 +70,23 @@ export function connectWebSocket(url: string): void {
                 handlePosition(data);
                 break;
             default:
-                console.warn("Type de message inconnu :", type);
+                console.warn("Unknown message type:", type);
         }
     };
 
     store.ws.onclose = () => {
-        console.log("Déconnecté du serveur WebSocket.");
+        console.log("Disconnected from the WebSocket server.");
         store.connected = false;
         clearInterval(interval);
     };
 
     store.ws.onerror = (err) => {
-        console.error("Erreur WebSocket :", err);
+        console.error("WebSocket error:", err);
     };
 }
 
 /**
- * Envoi d'un message JSON via WebSocket
+ * Send a JSON message via WebSocket
  */
 export function sendMessage(msg: WsMessage): void {
     if (store.ws && store.connected) {

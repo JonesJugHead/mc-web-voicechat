@@ -2,15 +2,15 @@ import { store } from "./store";
 import { sendMessage } from "./websocket";
 
 /**
- * Configuration RTC (serveurs STUN/TURN si besoin)
+ * RTC Configuration (STUN/TURN servers if needed)
  */
 const rtcConfig: RTCConfiguration = {
   iceServers: []
 };
 
 /**
- * Retourne le RTCPeerConnection existant pour un peerId
- * ou le crée s'il n'existe pas
+ * Returns the existing RTCPeerConnection for a peerId
+ * or creates one if it doesn't exist
  */
 export function getOrCreatePeerConnection(peerId: string): RTCPeerConnection {
   if (store.peers[peerId]) {
@@ -36,7 +36,7 @@ export function getOrCreatePeerConnection(peerId: string): RTCPeerConnection {
     createSpatialAudioNode(peerId, remoteStream);
   };
 
-  // Si on a déjà le flux local (micro), on l'ajoute
+  // If we already have the local stream (microphone), add it
   if (store.localStream) {
     store.localStream.getTracks().forEach(track => {
       pc.addTrack(track, store.localStream!);
@@ -48,50 +48,49 @@ export function getOrCreatePeerConnection(peerId: string): RTCPeerConnection {
 }
 
 /**
- * Crée un noeud audio spatial (source -> panner -> gain -> destination)
+ * Creates a spatial audio node (source -> panner -> gain -> destination)
  */
 export function createSpatialAudioNode(peerId: string, remoteStream: MediaStream): void {
   if (!store.audioContext) return;
 
-  // (Optionnel) Création d'un <audio> caché pour debug
+  // (Optional) Create a hidden <audio> element for debugging
   let audioElem = document.getElementById("audio-" + peerId) as HTMLAudioElement;
   if (!audioElem) {
     audioElem = document.createElement("audio");
     audioElem.id = "audio-" + peerId;
-    audioElem.autoplay = false; // on utilise l'AudioContext
+    audioElem.autoplay = false; // we use the AudioContext
     audioElem.style.display = "none";
     document.body.appendChild(audioElem);
   }
   audioElem.srcObject = remoteStream;
 
-  // Création des noeuds Web Audio
+  // Create Web Audio nodes
   const sourceNode = store.audioContext.createMediaStreamSource(remoteStream);
   const pannerNode = store.audioContext.createStereoPanner();
   const gainNode = store.audioContext.createGain();
 
   const filterNode = store.audioContext.createBiquadFilter();
   filterNode.type = "lowpass";
-  filterNode.frequency.value = 20000; // par défaut, très haut => inaudible
+  filterNode.frequency.value = 20000; // default to very high => inaudible
 
-  // Chaînage : source -> panner -> gain -> filtre -> destination
+  // Chain: source -> panner -> gain -> filter -> destination
   sourceNode
     .connect(pannerNode)
     .connect(gainNode)
     .connect(filterNode)
     .connect(store.audioContext.destination);
 
-  // Stocke ces noeuds pour pouvoir ajuster volume/pan plus tard
+  // Store these nodes to adjust volume/pan later
   store.audioNodes[peerId] = {
     source: sourceNode,
     panner: pannerNode,
     gain: gainNode,
     filter: filterNode
   };
-
 }
 
 /**
- * Réception d'un message "join"
+ * Handle "join" message
  */
 export function handleJoin(peerId: string): void {
   console.log("handleJoin from", peerId);
@@ -112,7 +111,7 @@ export function handleJoin(peerId: string): void {
 }
 
 /**
- * Réception d'un message "offer"
+ * Handle "offer" message
  */
 export function handleOffer(peerId: string, offer: RTCSessionDescriptionInit): void {
   console.log("handleOffer from", peerId);
@@ -134,7 +133,7 @@ export function handleOffer(peerId: string, offer: RTCSessionDescriptionInit): v
 }
 
 /**
- * Réception d'un message "answer"
+ * Handle "answer" message
  */
 export function handleAnswer(peerId: string, answer: RTCSessionDescriptionInit): void {
   console.log("handleAnswer from", peerId);
@@ -143,7 +142,7 @@ export function handleAnswer(peerId: string, answer: RTCSessionDescriptionInit):
 }
 
 /**
- * Réception d'un message "candidate"
+ * Handle "candidate" message
  */
 export function handleCandidate(peerId: string, candidate: RTCIceCandidateInit): void {
   console.log("handleCandidate from", peerId);

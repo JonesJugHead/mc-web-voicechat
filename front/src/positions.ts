@@ -15,10 +15,10 @@ export function handlePosition({ targets }: WsMessage): void {
                 const absAngle = Math.abs(angle);       // 0..π
                 const ratio = absAngle / Math.PI;       // 0..1
     
-                const freqFront = 20000; // devant : aucune coupure
-                const freqBack = 2000;   // derrière : coupe aigus
+                const freqFront = 20000; // front : no filter
+                const freqBack = 2000;   // back : low-pass filter
     
-                // Interpolation linéaire
+                // Linear interpolation between freqFront and freqBack
                 const freq = freqFront + (freqBack - freqFront) * ratio;
                 audioNodeConfig.filter.frequency.value = freq;
             }

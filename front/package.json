@@ -1,7 +1,13 @@
 {
-  "name": "front",
-  "private": true,
-  "version": "0.0.0",
+  "name": "mc-web-voicechat-front",
+  "private": false,
+  "version": "1.0.0",
+  "description": "Vite + TypeScript project for WebRTC voice chat with Minecraft WebVoiceChat Plugin",
+  "author": "Théo Vidal <contact@theo-vidal.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dalvii/mc-web-voicechat"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
