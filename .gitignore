@@ -105,3 +105,7 @@ fabric.properties
 
 # *.iml
 # modules.xml
+
+
+# resources 
+plugin/src/main/resources/web/*
