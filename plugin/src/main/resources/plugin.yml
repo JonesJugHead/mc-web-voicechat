@@ -2,3 +2,13 @@ name: WebVoiceChatPlugin
 version: 1.0
 main: com.dalvi.WebVoiceChatPlugin
 api-version: 1.21.3
+commands:
+  setmaxdistance:
+    description: Définit la distance maximale pour le calcul de la voix.
+    usage: /setmaxdistance <distance>
+    permission: webvoicechat.setmaxdistance
+    permission-message: Vous n'avez pas la permission d'exécuter cette commande.
+permissions:
+  webvoicechat.setmaxdistance:
+    description: Permet de définir la distance maximale pour la voix.
+    default: op

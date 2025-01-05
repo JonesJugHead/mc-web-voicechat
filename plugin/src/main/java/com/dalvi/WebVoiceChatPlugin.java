@@ -14,6 +14,8 @@ public class WebVoiceChatPlugin extends JavaPlugin {
     private static final int JETTY_PORT = 25566; // Port HTTP + WebSocket
     private JettyServer jettyServer;
 
+    private static double maxDistance = 20.0;
+
     private static final Map<String, PlayerData> playerPositions = new HashMap<>();
 
     @Override
@@ -31,8 +33,8 @@ public class WebVoiceChatPlugin extends JavaPlugin {
             e.printStackTrace();
         }
 
-        // 2) Enregistrer l'EventListener pour le PlayerMoveEvent
         Bukkit.getPluginManager().registerEvents(new WebVoiceChatMoveListener(this), this);
+        this.getCommand("setmaxdistance").setExecutor(new SetMaxDistanceCommand(this));
 
         log.info("WebVoiceChatPlugin activé !");
     }
@@ -59,6 +61,14 @@ public class WebVoiceChatPlugin extends JavaPlugin {
 
     public static PlayerData getPlayerData(String playerName) {
         return playerPositions.get(playerName);
+    }
+
+    public static double getMaxDistance() {
+        return maxDistance;
+    }
+
+    public static void setMaxDistance(double distance) {
+        maxDistance = distance;
     }
 
 
@@ -112,7 +122,7 @@ public class WebVoiceChatPlugin extends JavaPlugin {
                 PlayerData sourceData = getPlayerData(sourceName);
                 if (sourceData == null) continue;
 
-                VolumePan vp = computeVolumePan(listenerData, sourceData, 20.0);
+                VolumePan vp = computeVolumePan(listenerData, sourceData, WebVoiceChatPlugin.getMaxDistance());
 
                 com.google.gson.JsonObject t = new com.google.gson.JsonObject();
                 t.addProperty("player", sourceName);
