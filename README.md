@@ -1,4 +1,4 @@
-# WebVoiceChat Plugin
+# WebVoiceChat Plugin 🌐🎙️
 
 **WebVoiceChat** brings immersive 3D sound to Minecraft! This plugin allows players to communicate with realistic, position-based audio that enhances gameplay. Whether you're exploring dungeons, building with friends, or battling enemies, you'll hear others exactly as if they were in the same space—with sound coming from the precise direction of its source.
 
@@ -6,40 +6,40 @@
 
 ---
 
-## Key Features
+## Key Features 🌟
 
-- **Proximity Voice Chat**: Hear players louder when they're close and softer when they're far away. 
-- **Immersive 3D Audio**: Sound is positioned based on the direction and distance of other players. Know instantly if a voice is coming from your left, right, front, or behind you.
-- **Integrated WebRTC Support**: Connect using a web browser on your phone, tablet, or computer—no mods needed!  
-- **Easy Configuration**: Adjust hearing distance dynamically with a simple command.  
+- **🎧 Proximity Voice Chat**: Hear players louder when they're close and softer when they're far away.  
+- **🌍 Immersive 3D Audio**: Sound is positioned based on the direction and distance of other players. Know instantly if a voice is coming from your left, right, front, or behind you.  
+- **🌐 Integrated WebRTC Support**: Connect using a web browser on your phone, tablet, or computer—no mods needed!  
+- **⚙️ Easy Configuration**: Adjust hearing distance dynamically with a simple command.  
 
 ---
 
-## How to Get Started
+## How to Get Started 🚀
 
-### 1. Install the Plugin
-1. Download the `WebVoiceChatPlugin.jar` file.  
-2. Place it in your server's `plugins` folder.  
-3. Restart your server.  
+### 1️⃣ Install the Plugin  
+1. 📥 Download the `WebVoiceChatPlugin.jar` file.  
+2. 🗂️ Place it in your server's `plugins` folder.  
+3. 🔄 Restart your server.  
 
-### 2. Open the Voice Chat in a Browser
+### 2️⃣ Open the Voice Chat in a Browser  
 Once the plugin is installed and running, open a compatible web browser and connect to the WebRTC interface.  
-- By default, the interface is available at `http://your-server-ip:25566`.
-- Use the same username as your Minecraft character when logging in.
+- By default, the interface is available at `http://your-server-ip:25566`.  
+- Use the same username as your Minecraft character when logging in.  
 
-### 3. Enjoy Talking to Nearby Players
-- Talk to others when you're close to them in-game.  
+### 3️⃣ Enjoy Talking to Nearby Players  
+- 🗣️ Talk to others when you're close to them in-game.  
 - Players farther away will sound quieter, and players behind you will sound different than those in front.  
 
 ---
 
-## Commands
+## Commands 📜
 
-| Command                    | Description                                      |   Permission                                      |
-|----------------------------|--------------------------------------------------|---------------------------------------------------|
+| Command                    | Description                                      | Permission                                      |
+|----------------------------|--------------------------------------------------|------------------------------------------------|
 | **/setmaxdistance \<dist>** | Sets the maximum hearing distance in blocks. Default is 20 blocks. | `webvoicechat.setmaxdistance` |
 
-Example:  
+**Example:**  
 ```
 /setmaxdistance 30
 ```
@@ -47,44 +47,52 @@ This increases the range to 30 blocks.
 
 ---
 
-## Troubleshooting
+## Troubleshooting 🛠️
 
-- **No Sound?** Ensure your microphone permissions are enabled in your browser. 
-- **Connection Issues?** Check that your server's port (`25566` by default) is open and accessible, and that your browser supports WebRTC.
-- **Microphone Selection**: You can change your microphone in the web interface's settings.
+- **🔇 No Sound?** Ensure your microphone permissions are enabled in your browser.  
+- **🌐 Connection Issues?** Check that your server's port (`25566` by default) is open and accessible, and that your browser supports WebRTC.  
+- **🎤 Microphone Selection**: You can change your microphone in the web interface's settings.  
 
 If you encounter other issues, contact your server admin or check the details below for advanced setup.
 
 ---
 
-### How It Works
+### How It Works ⚙️
 
-1. **Proximity Detection**: The plugin continuously tracks player positions and determines which players are within hearing distance of each other.
-2. **Spatial Audio**: For players within range, the server calculates `volume` and `pan` (left-right positioning) and sends these values to the browser for precise audio rendering.
-3. **WebSocket Server**: The plugin starts a built-in server to manage WebRTC connections and signal audio streams.
+1. **📡 Proximity Detection**: The plugin continuously tracks player positions and determines which players are within hearing distance of each other.  
+2. **🔊 Spatial Audio**: For players within range, the server calculates `volume` and `pan` (left-right positioning) and sends these values to the browser for precise audio rendering.  
+3. **🔌 WebSocket Server**: The plugin starts a built-in server to manage WebRTC connections and signal audio streams.
 
 ---
 
-## For Developers
+### Upcoming Features 🔮
 
-If you'd like to build or modify the plugin:
-1. Clone the repository:  
+- **🔒 Authentication System**: Ensure secure connections by using a unique link sent in the in-game chat or entering a one-time authentication code displayed in the chat on the web interface.  
+- **📡 Centralized WebRTC Communication**: Improve performance for large servers by centralizing WebRTC connections, preventing exponential degradation of audio quality as more players join.  
+- **🔌 Optimized Player Connections**: Save bandwidth by automatically disconnecting audio streams between distant players instead of muting them. Connections will seamlessly re-establish as players move closer.  
+- **🎛️ Enhanced UI Controls**: Provide better user control over the interface, including muting the microphone, selecting the audio output, and adjusting input/output volumes.  
+
+---
+
+## For Developers 👩‍💻👨‍💻
+
+If you'd like to build or modify the plugin:  
+1. **🔄 Clone the repository:**  
    ```bash
    git clone https://github.com/Dalvii/mc-web-voicechat.git
    cd mc-web-voicechat
    ```
-2. Build the plugin using Gradle:  
+2. **🛠️ Build the plugin using Gradle:**  
    ```bash
-    ./gradlew shadowJar
+   ./gradlew shadowJar
    ```
-3. The compiled JAR file will be located in the `build/` folder.
+3. **📂 Find the JAR file** in the `build/` folder.
 
 ---
 
-### Thank You for Using WebVoiceChat!
+### Thank You for Using WebVoiceChat! 🎉
 
 Feel free to report bugs, request features, or contribute to development. Let’s make Minecraft communication better together! 🎙️
-
 
 ---
 
@@ -149,6 +157,13 @@ Si vous rencontrez d'autres problèmes, contactez votre administrateur de serveu
 1. **Détection de proximité**: Le plugin suit en continu les positions des joueurs et détermine quels joueurs sont à portée de voix les uns des autres.
 2. **Audio spatial**: Pour les joueurs à portée, le serveur calcule le `volume` et le `pan` (positionnement gauche-droite) et envoie ces valeurs au navigateur pour un rendu audio précis.
 3. **Serveur WebSocket**: Le plugin démarre un serveur intégré pour gérer les connexions WebRTC et signaler les flux audio.
+
+### Prochains ajouts
+
+- **Système d'authentification** : Garantissez des connexions sécurisées grâce à un lien unique envoyé dans le chat en jeu ou en saisissant un code d'authentification affiché dans le chat sur l'interface web.
+- **Centralisation des communications WebRTC** : Améliorez les performances des grands serveurs en centralisant les connexions WebRTC, évitant ainsi la dégradation exponentielle de la qualité audio lorsque de nombreux joueurs rejoignent.
+- **Optimisation des connexions entre joueurs** : Économisez la bande passante en coupant automatiquement les flux audio entre les joueurs éloignés au lieu de les mettre en sourdine. La connexion sera rétablie automatiquement et de manière transparente lorsque les joueurs se rapprochent.
+- **Meilleur contrôle de l'interface utilisateur** : Offrez plus de contrôle aux utilisateurs, avec des options pour couper le microphone, choisir la sortie audio et régler les volumes d'entrée et de sortie.
 
 ---
 
