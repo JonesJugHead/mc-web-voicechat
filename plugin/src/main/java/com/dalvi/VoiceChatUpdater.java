@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.UUID;
+
 public class VoiceChatUpdater extends BukkitRunnable {
 
     private final WebVoiceChatPlugin plugin;
@@ -75,7 +77,7 @@ public class VoiceChatUpdater extends BukkitRunnable {
                 json.add("targets", targetsArray);
 
                 // Send this JSON only to A
-                this.sendToPlayer(a.getName(), json.toString());
+                this.sendToPlayer(a.getUniqueId(), json.toString());
             }
         }
     }
@@ -110,8 +112,8 @@ public class VoiceChatUpdater extends BukkitRunnable {
         return new VolumePan(volume, pan, angle);
     }
 
-    public void sendToPlayer(String playerName, String message) {
-        WebSocketEndpoint endpoint = JettyServer.endpointsByPlayer.get(playerName);
+    public void sendToPlayer(UUID playerId, String message) {
+        WebSocketEndpoint endpoint = plugin.endpointsByPlayer.get(playerId);
         if (endpoint != null) {
             endpoint.sendMessage(message);
         }

@@ -1,4 +1,7 @@
+import { store } from "./store";
+
 export const pseudoInput = document.getElementById("pseudo") as HTMLInputElement;
+export const pseudoLabel = document.getElementById("pseudoLabel") as HTMLLabelElement;
 export const connectBtn = document.getElementById("connectBtn") as HTMLButtonElement;
 export const startAudioBtn = document.getElementById("startAudioBtn") as HTMLButtonElement;
 export const muteMicroBtn = document.getElementById("muteMicroBtn") as HTMLButtonElement;
@@ -9,6 +12,18 @@ export const setPseudoDisabled = (disabled: boolean) => {
     pseudoInput.disabled = disabled;
     connectBtn.disabled = disabled;
 };
+
+
+store.onAuthRequiredChange((authRequired) => {
+    if (authRequired) {
+        pseudoLabel.textContent = "Auth Code :";
+        pseudoInput.placeholder = "Enter the auth code";
+        return;
+    } else {
+        pseudoLabel.textContent = "Username (same as your Minecraft username):";
+        pseudoInput.placeholder = "MyMinecraftUsername";
+    }
+})
 
 
 export const setMicrophoneControls = (enabled: boolean) => {

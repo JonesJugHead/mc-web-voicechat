@@ -1,5 +1,5 @@
 name: WebVoiceChatPlugin
-version: 1.0
+version: 1.7
 main: com.dalvi.WebVoiceChatPlugin
 api-version: 1.21.3
 commands:
@@ -8,7 +8,18 @@ commands:
     usage: /setmaxdistance <distance>
     permission: webvoicechat.setmaxdistance
     permission-message: You do not have permission to execute this command.
+  auth:
+    description: Authenticate with the WebVoiceChat server or manage authentication settings.
+    usage: /auth [on|off|status]
+    permission: webvoicechat.auth
+    permission-message: You do not have permission to execute this command.
 permissions:
   webvoicechat.setmaxdistance:
     description: Allows setting the maximum distance for voice.
+    default: op
+  webvoicechat.auth:
+    description: Allows use of the /auth command.
+    default: true
+  webvoicechat.auth.manage:
+    description: Allows managing authentication settings.
     default: op

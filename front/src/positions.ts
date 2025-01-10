@@ -1,7 +1,7 @@
 import { store } from "./store";
-import { WsMessage } from "./types";
+import { WsPositionMessage } from "./types";
 
-export function handlePosition({ targets }: WsMessage): void {
+export function handlePosition({ targets }:  WsPositionMessage): void {
     if (!targets) return;
 
     targets.forEach(({ player, volume, pan, angle }) => {

@@ -1,5 +1,6 @@
 package com.dalvi;
 
+import com.dalvi.auth.AuthStatusServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -7,22 +8,17 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class JettyServer {
 
     private final int port;
     private Server server;
+    private final WebVoiceChatPlugin plugin;
 
-    public static final Set<WebSocketEndpoint> endpoints = new HashSet<>();
-    // Map pseudo -> endpoint
-    public static final Map<String, WebSocketEndpoint> endpointsByPlayer = new HashMap<>();
 
-    public JettyServer(int port) {
+    public JettyServer(int port, WebVoiceChatPlugin plugin) {
         this.port = port;
+        this.plugin = plugin;
     }
 
     public void start() throws Exception {
@@ -40,12 +36,15 @@ public class JettyServer {
             System.out.println("[MyJettyServer] /web/ not found in the JAR.");
         }
 
+        // create endpoint to get auth required status
+        context.addServlet(new ServletHolder("authstatus", new AuthStatusServlet(plugin)), "/authstatus");
+
         // DefaultServlet for static resources
         ServletHolder holder = new ServletHolder("default", new DefaultServlet());
         context.addServlet(holder, "/*");
 
         JettyWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
-            wsContainer.addMapping("/ws", (req, resp) -> new WebSocketEndpoint());
+            wsContainer.addMapping("/ws", (req, resp) -> new WebSocketEndpoint(plugin));
         });
 
         server.start();

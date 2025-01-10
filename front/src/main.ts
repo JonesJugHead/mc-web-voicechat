@@ -7,6 +7,7 @@ import {
   store
 } from "./store";
 import { connectBtn, disconnectBtn, pseudoInput, resetUI, setPseudoDisabled, showToast, startAudioBtn } from './dom';
+import { fetchAuthRequiredStatus } from './auth';
 
 // @ts-ignore
 window.store = store;
@@ -15,15 +16,30 @@ window.store = store;
 const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTMLButtonElement;
 const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
 
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const { authRequired } = await fetchAuthRequiredStatus();
+    store.setAuthRequired(authRequired)
+  } catch (error) {
+    console.error("Error fetching auth status:", error);
+    showToast("Unable to retrieve the auth status.");
+  }
+})
+
+
+
 /**
  * "Connect" button: initializes username, connects WebSocket
  */
 connectBtn.onclick = () => {
   const pseudo = pseudoInput.value.trim();
   if (!pseudo) {
-    showToast("Please enter your username.");
+    showToast("Please fill the input field.");
     return;
   }
+
 
   // Store the username in the store
   store.localPseudo = pseudo;
@@ -38,12 +54,18 @@ connectBtn.onclick = () => {
 
   // After a short delay, send a "join" message
   setTimeout(() => {
-    sendMessage({
-      type: "join",
-      from: store.localPseudo,
-      to: null,
-      payload: {}
-    });
+    if (store.authRequired) {
+      // Send the auth code to the server
+      sendMessage({
+        type: "auth",
+        code: store.localPseudo
+      });
+    } else {
+      sendMessage({
+        type: "join",
+        from: store.localPseudo,
+      });
+    }
   }, 500);
 
   setPseudoDisabled(true);

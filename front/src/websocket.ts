@@ -5,7 +5,7 @@ import {
     handleAnswer,
     handleCandidate
 } from "./webrtc";
-import { WsMessage } from "./types";
+import { WsErrorMessages as WsErrorMessage, WsMessage } from "./types";
 import { handlePosition } from "./positions";
 import { resetUI, setConectionControls, showToast } from "./dom";
 
@@ -45,28 +45,38 @@ export function connectWebSocket(url: string): void {
             return;
         }
 
-        const { type, from, to } = data;
+        const { type } = data;
 
         // Other WebRTC messages: ignore if not for us
-        if (to && to !== store.localPseudo) return;
+        if ((
+                type === "join" ||
+                type === 'answer' ||
+                type === 'candidate' ||
+                type === 'offer'
+            ) && data.to !== store.localPseudo
+        ) return;
+        
 
         switch (type) {
             case "join":
-                if (from) handleJoin(from);
+                if (data.from) handleJoin(data.from);
                 break;
             case "offer":
-                if (from && data.payload) handleOffer(from, data.payload);
+                if (data.from && data.payload) handleOffer(data.from, data.payload);
                 break;
             case "answer":
-                if (from && data.payload) handleAnswer(from, data.payload);
+                if (data.from && data.payload) handleAnswer(data.from, data.payload);
                 break;
             case "candidate":
-                if (from && data.payload) handleCandidate(from, data.payload);
+                if (data.from && data.payload) handleCandidate(data.from, data.payload);
                 break;
             case "ping":
                 store.ws?.send(JSON.stringify({ type: "pong" }));
                 break;
             case "pong":
+                break;
+            case 'error':
+                handleError(data.message as WsErrorMessage);
                 break;
             case "spatial":
                 handlePosition(data);
@@ -95,5 +105,31 @@ export function connectWebSocket(url: string): void {
 export function sendMessage(msg: WsMessage): void {
     if (store.ws && store.connected) {
         store.ws.send(JSON.stringify(msg));
+    }
+}
+
+
+function handleError(message?: WsErrorMessage): void {
+    console.warn("Server error:", message);
+    resetUI();
+
+    switch (message) {
+        case 'INVALID_CODE':
+            showToast("Invalid code. Please try again.");
+            break;
+        case 'AUTH_REQUIRED':
+            store.setAuthRequired(true);
+            showToast("Authentication required.");
+            break;
+        case 'AUTH_NOT_REQUIRED':
+            store.setAuthRequired(false);
+            showToast("Authentication not required.");
+            break;
+        case 'PLAYER_NOT_FOUND':
+            showToast("Player not found.");
+            break;
+        default:
+            showToast("An error occurred. Please try again.");
+            break;
     }
 }
