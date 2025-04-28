@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 public class WebVoiceChatPlugin extends JavaPlugin {
-    private static final int JETTY_PORT = 25566; // HTTP + WebSocket port
+    private static final int JETTY_PORT = 30123; // HTTP + WebSocket port
     private static boolean isAuthRequired = false;
     private static double maxDistance = 20.0;
 
