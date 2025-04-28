@@ -1,34 +1,37 @@
-import './style.css'
+import "./style.css";
+import { connectWebSocket, sendMessage } from "./websocket";
+import { store } from "./store";
 import {
-  connectWebSocket,
-  sendMessage
-} from "./websocket";
-import {
-  store
-} from "./store";
-import { connectBtn, disconnectBtn, pseudoInput, resetUI, setPseudoDisabled, showToast, startAudioBtn } from './dom';
-import { fetchAuthRequiredStatus } from './auth';
+  connectBtn,
+  disconnectBtn,
+  pseudoInput,
+  resetUI,
+  setPseudoDisabled,
+  showToast,
+  startAudioBtn,
+} from "./dom";
+import { fetchAuthRequiredStatus } from "./auth";
 
 // @ts-ignore
 window.store = store;
 
 // DOM elements retrieval
-const applyMicrophoneBtn = document.getElementById("applyMicrophoneBtn") as HTMLButtonElement;
-const micSelect = document.getElementById("microphoneSelect") as HTMLSelectElement;
-
-
+const applyMicrophoneBtn = document.getElementById(
+  "applyMicrophoneBtn"
+) as HTMLButtonElement;
+const micSelect = document.getElementById(
+  "microphoneSelect"
+) as HTMLSelectElement;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const { authRequired } = await fetchAuthRequiredStatus();
-    store.setAuthRequired(authRequired)
+    store.setAuthRequired(authRequired);
   } catch (error) {
     console.error("Error fetching auth status:", error);
     showToast("Unable to retrieve the auth status.");
   }
-})
-
-
+});
 
 /**
  * "Connect" button: initializes username, connects WebSocket
@@ -40,7 +43,6 @@ connectBtn.onclick = () => {
     return;
   }
 
-
   // Store the username in the store
   store.localPseudo = pseudo;
 
@@ -50,7 +52,7 @@ connectBtn.onclick = () => {
   store.audioContext = ctx;
 
   // Start WebSocket connection (adapt the URL to your server)
-  connectWebSocket("wss://" + window.location.host + "/ws");
+  connectWebSocket("ws://" + window.location.host + "/ws");
 
   // After a short delay, send a "join" message
   setTimeout(() => {
@@ -58,7 +60,7 @@ connectBtn.onclick = () => {
       // Send the auth code to the server
       sendMessage({
         type: "auth",
-        code: store.localPseudo
+        code: store.localPseudo,
       });
     } else {
       sendMessage({
@@ -76,29 +78,32 @@ connectBtn.onclick = () => {
  */
 startAudioBtn.onclick = async () => {
   try {
-    store.localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    store.localStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
     console.log("Microphone captured.");
 
     // Add this stream to each existing PeerConnection
     Object.keys(store.peers).forEach((peerId) => {
       const pc = store.peers[peerId];
-      store.localStream!.getTracks().forEach(track => {
+      store.localStream!.getTracks().forEach((track) => {
         pc.addTrack(track, store.localStream!);
       });
     });
 
     // Optional: restart an offer to send the stream
-    Object.keys(store.peers).forEach(peerId => {
+    Object.keys(store.peers).forEach((peerId) => {
       const pc = store.peers[peerId];
       pc.createOffer()
-        .then(offer => pc.setLocalDescription(offer))
+        .then((offer) => pc.setLocalDescription(offer))
         .then(() => {
           if (!pc.localDescription) return;
           sendMessage({
             type: "offer",
             from: store.localPseudo,
             to: peerId,
-            payload: pc.localDescription
+            payload: pc.localDescription,
           });
         })
         .catch(console.error);
@@ -112,7 +117,7 @@ startAudioBtn.onclick = async () => {
 };
 
 disconnectBtn.onclick = () => {
-  Object.keys(store.peers).forEach(peerId => {
+  Object.keys(store.peers).forEach((peerId) => {
     store.peers[peerId].close();
     delete store.peers[peerId];
   });
@@ -124,24 +129,26 @@ disconnectBtn.onclick = () => {
 
   // Reset the store
   store.localPseudo = "";
-  store.localStream?.getTracks().forEach(track => track.stop());
+  store.localStream?.getTracks().forEach((track) => track.stop());
   store.localStream = null;
 
   // Reset the UI
-  resetUI()
+  resetUI();
 };
 
 async function populateMicrophoneList() {
-
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const audioInputs = devices.filter(device => device.kind === "audioinput");
+    const audioInputs = devices.filter(
+      (device) => device.kind === "audioinput"
+    );
 
     micSelect.innerHTML = ""; // Reset the list
-    audioInputs.forEach(device => {
+    audioInputs.forEach((device) => {
       const option = document.createElement("option");
       option.value = device.deviceId;
-      option.textContent = device.label || `Microphone ${micSelect.options.length + 1}`;
+      option.textContent =
+        device.label || `Microphone ${micSelect.options.length + 1}`;
       micSelect.appendChild(option);
     });
 
@@ -166,34 +173,34 @@ applyMicrophoneBtn.onclick = async () => {
   try {
     const newStream = await navigator.mediaDevices.getUserMedia({
       audio: { deviceId: { exact: deviceId } },
-      video: false
+      video: false,
     });
 
     if (store.localStream) {
-      store.localStream.getTracks().forEach(track => track.stop());
+      store.localStream.getTracks().forEach((track) => track.stop());
     }
     store.localStream = newStream;
 
     console.log("New microphone activated:", deviceId);
 
-    Object.keys(store.peers).forEach(peerId => {
+    Object.keys(store.peers).forEach((peerId) => {
       const pc = store.peers[peerId];
-      store.localStream!.getTracks().forEach(track => {
+      store.localStream!.getTracks().forEach((track) => {
         pc.addTrack(track, store.localStream!);
       });
     });
 
-    Object.keys(store.peers).forEach(peerId => {
+    Object.keys(store.peers).forEach((peerId) => {
       const pc = store.peers[peerId];
       pc.createOffer()
-        .then(offer => pc.setLocalDescription(offer))
+        .then((offer) => pc.setLocalDescription(offer))
         .then(() => {
           if (!pc.localDescription) return;
           sendMessage({
             type: "offer",
             from: store.localPseudo,
             to: peerId,
-            payload: pc.localDescription
+            payload: pc.localDescription,
           });
         })
         .catch(console.error);
@@ -205,5 +212,3 @@ applyMicrophoneBtn.onclick = async () => {
     console.error("Error selecting the microphone:", err);
   }
 };
-
-
