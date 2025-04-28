@@ -13,13 +13,11 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Version mise à jour
 
       # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: 20
 
       # Install and build the front project
       - name: Build front
@@ -35,56 +33,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-     # Build the Gradle project with shadowJar
+      # Build the Gradle project with shadowJar
       - name: Build plugin with shadowJar
         working-directory: ./plugin
         run: ./gradlew shadowJar
 
-      # Determine the next release version
-      - name: Determine next release version
-        id: version
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # Get the latest release version from GitHub
-          latest_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' || echo "1.0")
-          # Extract the minor version and increment it
-          minor_version=$(echo $latest_release | cut -d. -f2)
-          next_minor_version=$((minor_version + 1))
-          next_version="1.$next_minor_version"
-          echo "next_version=$next_version" >> $GITHUB_ENV
-          echo "Next version: $next_version"
-
       # Upload the jar file as an artifact
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # Version mise à jour ici
         with:
           name: WebVoiceChatPlugin
           path: plugin/build/libs/WebVoiceChatPlugin.jar
-
-      # Create a GitHub Release
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: v${{ env.next_version }}
-          release_name: Release-v${{ env.next_version }}
-          body: |
-            ### Changes
-            - Front-end built and packaged.
-            - Gradle project built with shadowJar.
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Upload the artifact to the release
-      - name: Upload Jar to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: plugin/build/libs/WebVoiceChatPlugin.jar
-          asset_name: WebVoiceChatPlugin-${{ env.next_version }}.jar
-          asset_content_type: application/java-archive
