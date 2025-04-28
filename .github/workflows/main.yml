@@ -35,7 +35,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-     # Build the Gradle project with shadowJar
+      # Build the Gradle project with shadowJar
       - name: Build plugin with shadowJar
         working-directory: ./plugin
         run: ./gradlew shadowJar
