@@ -26,7 +26,7 @@ public class JettyServer {
         server = new Server();
 
         // Configuration SSL
-        SslContextFactory sslContextFactory = new SslContextFactory.Server();
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath("keystore.jks"); // Chemin vers votre keystore
         sslContextFactory.setKeyStorePassword("Qx2ghQvibT1Iod0lidduF2iogXG9LyfLEFaFGzgp2oY4rMWwqtVvY"); // Mot de passe de votre keystore
         sslContextFactory.setKeyManagerPassword("Qx2ghQvibT1Iod0lidduF2iogXG9LyfLEFaFGzgp2oY4rMWwqtVvY"); // Mot de passe de la clé
