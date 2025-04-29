@@ -29,11 +29,11 @@ public class JettyServer {
         System.out.println("[JettyServer] 🛡️ Initialisation SSL...");
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         // Chemin relatif depuis la racine du projet (adapter si besoin)
-        sslContextFactory.setKeyStorePath("src/main/resources/keystore.p12");
+        sslContextFactory.setKeyStorePath("keystore.p12");
         sslContextFactory.setKeyStorePassword("changeit"); // Maitre, change ce mot de passe dans ton .env !
         sslContextFactory.setKeyManagerPassword("changeit");
         sslContextFactory.setKeyStoreType("PKCS12");
-        System.out.println("[JettyServer] 🛡️ Keystore chargé: src/main/resources/keystore.p12");
+        System.out.println("[JettyServer] 🛡️ Keystore chargé: keystore.p12");
         // Créer un connecteur pour HTTPS
         ServerConnector sslConnector = new ServerConnector(server, sslContextFactory);
         sslConnector.setPort(port); // Port pour HTTPS
