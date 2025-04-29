@@ -25,12 +25,15 @@ public class JettyServer {
     public void start() throws Exception {
         server = new Server();
 
-        // Configuration SSL
+        // Configuration SSL 🛡️✨
+        System.out.println("[JettyServer] 🛡️ Initialisation SSL...");
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath("keystore.jks"); // Chemin vers votre keystore
-        sslContextFactory.setKeyStorePassword("Qx2ghQvibT1Iod0lidduF2iogXG9LyfLEFaFGzgp2oY4rMWwqtVvY"); // Mot de passe de votre keystore
-        sslContextFactory.setKeyManagerPassword("Qx2ghQvibT1Iod0lidduF2iogXG9LyfLEFaFGzgp2oY4rMWwqtVvY"); // Mot de passe de la clé
-
+        // Chemin relatif depuis la racine du projet (adapter si besoin)
+        sslContextFactory.setKeyStorePath("src/main/resources/keystore.p12");
+        sslContextFactory.setKeyStorePassword("changeit"); // Maitre, change ce mot de passe dans ton .env !
+        sslContextFactory.setKeyManagerPassword("changeit");
+        sslContextFactory.setKeyStoreType("PKCS12");
+        System.out.println("[JettyServer] 🛡️ Keystore chargé: src/main/resources/keystore.p12");
         // Créer un connecteur pour HTTPS
         ServerConnector sslConnector = new ServerConnector(server, sslContextFactory);
         sslConnector.setPort(port); // Port pour HTTPS
@@ -62,7 +65,9 @@ public class JettyServer {
         });
 
         // Démarrer le serveur
+        System.out.println("[JettyServer] 🚀 Démarrage du serveur HTTPS sur le port " + port + " !");
         server.start();
+        System.out.println("[JettyServer] ✅ Serveur HTTPS démarré !");
     }
 
     public void stop() throws Exception {

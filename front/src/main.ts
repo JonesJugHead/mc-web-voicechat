@@ -52,7 +52,7 @@ connectBtn.onclick = () => {
   store.audioContext = ctx;
 
   // Start WebSocket connection (adapt the URL to your server)
-  connectWebSocket("ws://" + window.location.host + "/ws");
+  connectWebSocket("wss://" + window.location.host + "/ws");
 
   // After a short delay, send a "join" message
   setTimeout(() => {
